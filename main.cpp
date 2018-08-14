@@ -18,9 +18,13 @@
 #include <errno.h>
 
 // Block devices
+#ifdef COMPONENT_SPIF
 #include "SPIFBlockDevice.h"
-#include "DataFlashBlockDevice.h"
+#elif COMPONENT_SD
 #include "SDBlockDevice.h"
+#endif
+
+#include "DataFlashBlockDevice.h"
 #include "HeapBlockDevice.h"
 
 // File systems
@@ -29,14 +33,23 @@
 
 
 // Physical block device, can be any device that supports the BlockDevice API
+#ifdef COMPONENT_SPIF
 SPIFBlockDevice bd(
         MBED_CONF_SPIF_DRIVER_SPI_MOSI,
         MBED_CONF_SPIF_DRIVER_SPI_MISO,
         MBED_CONF_SPIF_DRIVER_SPI_CLK,
         MBED_CONF_SPIF_DRIVER_SPI_CS);
+#elif COMPONENT_SD
+SDBlockDevice bd(
+        MBED_CONF_SD_SPI_MOSI,
+        MBED_CONF_SD_SPI_MISO,
+        MBED_CONF_SD_SPI_CLK,
+        MBED_CONF_SD_SPI_CS);
+#endif
+
 
 // File system declaration
-LittleFileSystem fs("fs");
+FATFileSystem fs("fs");
 
 
 // Set up the button to trigger an erase
